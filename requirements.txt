@@ -1,0 +1,12 @@
+fastapi
+motor
+pydantic
+regex
+typing-extensions
+uvicorn
+fastapi_utils
+passlib[bcrypt]
+mangum
+jose
+bson
+decouple
