@@ -129,7 +129,7 @@ async def make_conversation(members: str, request: Request):
             )
         else:
             return ErrorResponseModel(
-                "An error occurred", 200, "conversation with nickname {0} can't create".format(payload.get('nickname'))
+                "An error occurred", 200, "conversation with nickname {0} can't create".format(nickname)
             )
 
 
@@ -196,5 +196,5 @@ async def update_conversation_data(conversationID: str, chat: ChatSchema, reques
         )
     else:
         return ErrorResponseModel(
-            "An error occurred", 200, "conversation with nickname {0} can't update".format(payload.get('nickname'))
+            "An error occurred", 200, "conversation with nickname {0} can't update".format(nickname)
         )

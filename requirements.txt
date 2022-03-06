@@ -10,3 +10,4 @@ mangum
 jose
 bson
 decouple
+flask

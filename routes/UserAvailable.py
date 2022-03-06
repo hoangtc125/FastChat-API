@@ -55,10 +55,10 @@ async def get_users():
     '''
     users = await retrieve_users()
     if users:
-        return ResponseModel(users, None, "users data retrieved successfully")
-    return ResponseModel(users, None, "Empty list returned")
+        return ResponseModel(users, "users data retrieved successfully")
+    return ResponseModel(users, "Empty list returned")
 
-@router.put("")
+@router.put("/")
 async def update_user_data(request: Request):
     '''
     This API support to update expired time of the user
