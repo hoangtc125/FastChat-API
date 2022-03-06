@@ -7,7 +7,7 @@
 ## Hướng dẫn cài đặt
 **FastChat** được viết bằng ngôn ngữ *Python* và *FastAPI*
 ### Truy cập online tại:
-![https://fastchatapi.deta.dev/](https://fastchatapi.deta.dev/)
+https://fastchatapi.deta.dev
 ### Các bước để chạy **FastChat** bằng CMD:
 1. git init
 2. git clone https://github.com/hoangtc125/FastChat.git
