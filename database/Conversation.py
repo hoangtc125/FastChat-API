@@ -58,7 +58,6 @@ async def update_conversation(conversationID: str, chatID: str):
     if conversation: 
         chats = conversation["chats"]
         chats.append(chatID)
-        print(chats)
         updated_conversation = await conversation_collection.update_one(
             {"_id": ObjectId(conversation["_id"])}, {"$set": { "chats": list(chats)}}
         )

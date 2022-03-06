@@ -1,6 +1,5 @@
 import datetime
 from fastapi import FastAPI
-from database.Conversation import delete_members
 from database.UserAvailable import (
     userAvailable_collection,
     expired_helper,
@@ -36,4 +35,3 @@ async def remove_offline_user() -> None:
 @app.get("/", tags=["Root"])
 async def read_root():
     return {"FastChat": "Welcome to FastChat"}
-

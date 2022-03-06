@@ -1,8 +1,7 @@
 
-def ResponseModel(data, token, message):
+def ResponseModel(data, message):
     return {
         "data": [data],
-        "token": token,
         "code": 200,
         "message": message,
     }

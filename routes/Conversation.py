@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from jose import jwt
 
@@ -31,18 +32,24 @@ from models.utils import(
 from .utils import(
     SECRET_KEY,
     ALGORITHM,
-    pwd_context,
 )
 
 router = APIRouter()
 
 @router.get("/", response_description="get all conversations which has new messages of user")
-async def get_conversations_unread(token: str = None):
+async def get_conversations_unread(request: Request):
     '''
     This API support to get ID from all conversations of an user
 
     It will be called frequently to notify user which conversation has new message
     '''
+    token = request.cookies.get("token")
+    if not token: 
+        return ErrorResponseModel(
+            "Unauthorized",
+            403,
+            "Server can not read token from your cookie.",
+        )
 
     nickname = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]).get('nickname')
     
@@ -63,7 +70,6 @@ async def get_conversations_unread(token: str = None):
     if conversations_noti:
         return ResponseModel(
             conversations_noti,
-            token, 
             "{0} you has conversations unread".format(nickname),
         )
     else:
@@ -73,12 +79,20 @@ async def get_conversations_unread(token: str = None):
 
 
 @router.post("/{members}", response_description="create new conversation or load conversation's content")
-async def make_conversation(members: str, token: str = None):
+async def make_conversation(members: str, request: Request):
     '''
     This API support to create new conversation between 2 users or load conversation
 
     It will be called frequently to update message to existed conversation
     '''
+    token = request.cookies.get("token")
+    if not token: 
+        return ErrorResponseModel(
+            "Unauthorized",
+            403,
+            "Server can not read token from your cookie.",
+        )
+
     nickname = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]).get('nickname')
 
     # check user or reciever is available?
@@ -97,10 +111,10 @@ async def make_conversation(members: str, token: str = None):
         chats = chats[-12:]
         for chat in chats:
             if not chat["seen"] and chat["sender"] != nickname:
+                chat["seen"] = True
                 await update_chat(str(chat["id"]))
         return ResponseModel(
             {"conversation": conversation, "chats": chats},
-            token, 
             "conversation was found",
         )
     else: # create a new conversation
@@ -111,7 +125,6 @@ async def make_conversation(members: str, token: str = None):
         if conversation:
             return ResponseModel(
                 conversation,
-                token, 
                 "conversation connect to {0} was created".format(members),
             )
         else:
@@ -120,15 +133,22 @@ async def make_conversation(members: str, token: str = None):
             )
 
 
-@router.put("/{token}", response_description="update new message to new conversation")
-async def update_conversation_data(token: str, chat: ChatSchema, conversationID: str = None):
+@router.put("/{conversationID}", response_description="update new message to new conversation")
+async def update_conversation_data(conversationID: str, chat: ChatSchema, request: Request):
     '''
     This API support to update message from user to their conversation
 
     Ussing to send message
     '''
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    nickname = payload.get('nickname')
+    token = request.cookies.get("token")
+    if not token: 
+        return ErrorResponseModel(
+            "Unauthorized",
+            403,
+            "Server can not read token from your cookie.",
+        )
+
+    nickname = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]).get('nickname')
 
     # check nickname is available?
     if not await retrieve_nickname(str(nickname)):
@@ -168,10 +188,10 @@ async def update_conversation_data(token: str, chat: ChatSchema, conversationID:
         chats = chats[-12:]
         for _chat in chats:
             if not _chat["seen"] and _chat["sender"] != nickname:
+                _chat["seen"] = True
                 await update_chat(str(_chat["id"]))
         return ResponseModel(
             {"conversation": conversation, "chats": chats},
-            token, 
             "conversation with a new massage updated successfully",
         )
     else:

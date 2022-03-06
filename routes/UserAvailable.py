@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Request
+from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from jose import jwt
 
@@ -6,7 +7,6 @@ from database.UserAvailable import (
     add_user,
     retrieve_users,
     update_user,
-    delete_nickname,
 )
 from models.UserAvailable import (
     UserSchema,
@@ -18,7 +18,6 @@ from models.utils import(
 from .utils import(
     SECRET_KEY,
     ALGORITHM,
-    pwd_context,
 )
 
 router = APIRouter()
@@ -42,7 +41,9 @@ async def create_new_user(user: UserSchema = Body(...)):
     token = jwt.encode({"nickname": user["nickname"], "startedAt": user["startedAt"]}, SECRET_KEY, algorithm=ALGORITHM)
     new_user = await add_user(user)
     users = await retrieve_users()
-    return ResponseModel({"user":new_user, "users":users}, token, "users data retrieved successfully")
+    response = JSONResponse(ResponseModel({"user":new_user, "users":users}, "users data retrieved successfully"))
+    response.set_cookie(key="token", value=token)
+    return response
 
 
 @router.get("/", response_description="users retrieved")
@@ -57,19 +58,26 @@ async def get_users():
         return ResponseModel(users, None, "users data retrieved successfully")
     return ResponseModel(users, None, "Empty list returned")
 
-@router.put("/{token}")
-async def update_user_data(token: str):
+@router.put("")
+async def update_user_data(request: Request):
     '''
     This API support to update expired time of the user
 
     API will be call frequently with input token
     '''
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    updated_user = await update_user(payload.get('nickname'))
+    token = request.cookies.get("token")
+    if not token: 
+        return ErrorResponseModel(
+            "Unauthorized",
+            403,
+            "Server can not read token from your cookie.",
+        )
+
+    nickname = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]).get('nickname')
+    updated_user = await update_user(nickname)
     if updated_user:
         return ResponseModel(
-            "user with nickname: {} name update is successful".format(payload.get('nickname')),
-            token, 
+            "user with nickname: {} name update is successful".format(nickname),
             "user name updated successfully",
         )
     else:
