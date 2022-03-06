@@ -1,13 +1,16 @@
+bcrypt
+cryptography
+dnspython
 fastapi
-motor
-pydantic
-regex
-typing-extensions
-uvicorn
-fastapi_utils
-passlib[bcrypt]
-mangum
+fastapi-utils
 jose
+motor == 2.5.1
+pydantic
+pymongo == 3.12.3
+python-decouple
+python-jose
+uvicorn
 bson
-decouple
-flask
+typing_extensions
+passlib
+deta
