@@ -5,9 +5,10 @@
 2. Chat nhanh với người dùng khác
 3. Sau khi thoát ứng dụng sẽ không lưu lại thông tin gì về *nickname* hay các *conversations*
 ## Hướng dẫn cài đặt
-**FastChat** được viết bằng ngôn ngữ *Python* và *FastAPI*
+**FastChat** được viết bằng *FastAPI*, *MongoDB Atlas Databases* và được deploy bằng *Deta*
 ### Truy cập online tại:
-https://fastchatapi.deta.dev
+- HomePage: https://fastchatapi.deta.dev
+- Test API tại: https://fastchatapi.deta.dev/docs
 ### Các bước để chạy **FastChat** bằng CMD:
 1. git init
 2. git clone https://github.com/hoangtc125/FastChat.git
